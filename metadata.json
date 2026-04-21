@@ -1,0 +1,6 @@
+{
+  "name": "Bangladesh District Explorer",
+  "description": "An interactive map of Bangladesh districts with hover highlights and custom mask layers using MapLibre GL JS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
