@@ -107,19 +107,33 @@ export default function App() {
               ],
               'fill-extrusion-height': [
                 'interpolate',
-                ['exponential', 2],
+                ['linear'],
                 ['zoom'],
                 6,
                 [
                   'case',
-                  ['boolean', ['feature-state', 'clicked'], false], 1200,
+                  ['boolean', ['feature-state', 'clicked'], false], 2400, // Doubling the popout intensity
+                  ['boolean', ['feature-state', 'hover'], false], 5,
+                  1
+                ],
+                8,
+                [
+                  'case',
+                  ['boolean', ['feature-state', 'clicked'], false], 1300, 
                   ['boolean', ['feature-state', 'hover'], false], 5,
                   1
                 ],
                 10,
                 [
                   'case',
-                  ['boolean', ['feature-state', 'clicked'], false], 75,
+                  ['boolean', ['feature-state', 'clicked'], false], 700, 
+                  ['boolean', ['feature-state', 'hover'], false], 5,
+                  1
+                ],
+                12,
+                [
+                  'case',
+                  ['boolean', ['feature-state', 'clicked'], false], 300,
                   ['boolean', ['feature-state', 'hover'], false], 5,
                   1
                 ]
