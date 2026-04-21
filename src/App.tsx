@@ -39,7 +39,8 @@ export default function App() {
             ...rawData,
             features: rawData.features.map((f: any) => {
               try {
-                const buffered = turf.buffer(f, -0.3, { units: 'kilometers' });
+                // Extremely thin inset for very fine separation
+                const buffered = turf.buffer(f, -0.1, { units: 'kilometers' });
                 return buffered || f;
               } catch (e) {
                 return f;
@@ -89,10 +90,10 @@ export default function App() {
               'fill-extrusion-height': [
                 'case',
                 ['boolean', ['feature-state', 'clicked'], false],
-                40, 
+                10, 
                 ['boolean', ['feature-state', 'hover'], false],
-                20, 
-                6   
+                5, 
+                1   // Almost flat base elevation
               ],
               'fill-extrusion-base': 0,
               'fill-extrusion-opacity': [
