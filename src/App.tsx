@@ -82,10 +82,10 @@ export default function App() {
               'fill-extrusion-color': [
                 'case',
                 ['boolean', ['feature-state', 'clicked'], false],
-                '#34d399', 
+                'rgba(52, 211, 153, 1)', // Solid click
                 ['boolean', ['feature-state', 'hover'], false],
-                '#6ee7b7', 
-                '#b8f5c8'  
+                'rgba(110, 231, 183, 0.83)', // 10% more transparent
+                'rgba(184, 245, 200, 0.88)'  // 5% more transparent
               ],
               'fill-extrusion-height': [
                 'case',
