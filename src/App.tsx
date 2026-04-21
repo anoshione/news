@@ -6,6 +6,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import * as turf from '@turf/turf';
 
 // MapLibre bounds are [minLng, minLat, maxLng, maxLat]
 const BANGLADESH_BOUNDS: [[number, number], [number, number]] = [
@@ -32,7 +33,19 @@ export default function App() {
         
         let districtsData;
         try {
-          districtsData = await response.json();
+          const rawData = await response.json();
+          // Create physical architectural gaps by insetting each polygon (negative buffer)
+          districtsData = {
+            ...rawData,
+            features: rawData.features.map((f: any) => {
+              try {
+                const buffered = turf.buffer(f, -0.3, { units: 'kilometers' });
+                return buffered || f;
+              } catch (e) {
+                return f;
+              }
+            })
+          };
         } catch (e) {
           throw new Error("The GeoJSON file is not valid JSON. Please check if the upload was complete.");
         }
@@ -76,27 +89,39 @@ export default function App() {
               'fill-extrusion-height': [
                 'case',
                 ['boolean', ['feature-state', 'clicked'], false],
-                120, 
+                40, 
                 ['boolean', ['feature-state', 'hover'], false],
-                60, 
-                25   // Base very slight elevation for a flatter look
+                20, 
+                6   
               ],
               'fill-extrusion-base': 0,
-              'fill-extrusion-opacity': 0.45 // Temporary increase to see the effect better
+              'fill-extrusion-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                6, 0.4,
+                10, 0.7
+              ] 
             }
           });
 
-          // District Lines - Using as a 2px "invisible" separator (matches background color)
+          // District Shadows/Base - Now placed BELOW the fills to ground the cells
           mapInstance.addLayer({
-            id: 'district-lines',
+            id: 'district-base',
             type: 'line',
             source: 'districts',
             paint: {
-              'line-color': '#ffffff', // Matches Positron background to create "gap" feel
-              'line-width': 2,
-              'line-opacity': 1 
+              'line-color': '#cbd5e1', 
+              'line-width': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                6, 0.5,
+                10, 2
+              ],
+              'line-opacity': 0.3 
             }
-          });
+          }, 'district-fills'); // Insert BEFORE fills to act as a base
 
           // Removed district-shadows as fill-extrusion handles its own 3D volume
 
