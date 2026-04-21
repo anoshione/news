@@ -42,7 +42,9 @@ export default function App() {
           style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
           center: [90.356, 23.685],
           zoom: 7,
-          dragRotate: false,
+          pitch: 45, // Tilt for 3D feel
+          bearing: -10, // Slight rotation for perspective
+          dragRotate: true, // Allow user to rotate
           touchZoomRotate: true,
           maxBounds: BANGLADESH_BOUNDS
         });
@@ -57,84 +59,46 @@ export default function App() {
             generateId: true
           });
 
-          // Integrated Interactive Fill Layer
+          // 3D Fill Extrusion Layer (Elevated Districts)
           mapInstance.addLayer({
             id: 'district-fills',
-            type: 'fill',
+            type: 'fill-extrusion',
             source: 'districts',
             paint: {
-              'fill-color': '#b8f5c8',
-              'fill-opacity': [
+              'fill-extrusion-color': [
                 'case',
                 ['boolean', ['feature-state', 'clicked'], false],
-                0.38,
+                '#34d399', 
                 ['boolean', ['feature-state', 'hover'], false],
-                0.35,
-                0.12
-              ]
+                '#6ee7b7', 
+                '#b8f5c8'  
+              ],
+              'fill-extrusion-height': [
+                'case',
+                ['boolean', ['feature-state', 'clicked'], false],
+                120, 
+                ['boolean', ['feature-state', 'hover'], false],
+                60, 
+                25   // Base very slight elevation for a flatter look
+              ],
+              'fill-extrusion-base': 0,
+              'fill-extrusion-opacity': 0.45 // Temporary increase to see the effect better
             }
           });
 
-          // Unified District Lines (Clean and uniform)
+          // District Lines - Using as a 2px "invisible" separator (matches background color)
           mapInstance.addLayer({
             id: 'district-lines',
             type: 'line',
             source: 'districts',
             paint: {
-              'line-color': '#1a1f2e',
-              'line-width': [
-                'case',
-                ['boolean', ['feature-state', 'hover'], false],
-                2,
-                ['boolean', ['feature-state', 'clicked'], false],
-                1.8,
-                0.8
-              ],
-              'line-offset': [
-                'case',
-                ['boolean', ['feature-state', 'hover'], false],
-                -1,
-                ['boolean', ['feature-state', 'clicked'], false],
-                -1.5,
-                0
-              ]
+              'line-color': '#ffffff', // Matches Positron background to create "gap" feel
+              'line-width': 2,
+              'line-opacity': 1 
             }
           });
 
-          // 3D "Shadow" layer for pop-out effect
-          mapInstance.addLayer({
-            id: 'district-shadows',
-            type: 'line',
-            source: 'districts',
-            paint: {
-              'line-color': '#000000',
-              'line-width': [
-                'case',
-                ['boolean', ['feature-state', 'hover'], false],
-                2,
-                ['boolean', ['feature-state', 'clicked'], false],
-                2.5,
-                0
-              ],
-              'line-opacity': [
-                'case',
-                ['boolean', ['feature-state', 'hover'], false],
-                0.15,
-                ['boolean', ['feature-state', 'clicked'], false],
-                0.25,
-                0
-              ],
-              'line-offset': [
-                'case',
-                ['boolean', ['feature-state', 'hover'], false],
-                1.5,
-                ['boolean', ['feature-state', 'clicked'], false],
-                2,
-                0
-              ],
-              'line-blur': 2
-            }
-          }, 'district-lines');
+          // Removed district-shadows as fill-extrusion handles its own 3D volume
 
           let hoveredId: string | number | null = null;
           let clickedId: string | number | null = null;
@@ -292,7 +256,7 @@ export default function App() {
       {/* Mobile Indicator - Help text for phone users */}
       <div className="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-10 bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 pointer-events-none">
         <span className="text-[10px] text-white/80 font-medium tracking-wide uppercase">
-          Tap district to see data • Pinch to zoom
+          Tap district to elevate • Pinch & Drag to move
         </span>
       </div>
       
