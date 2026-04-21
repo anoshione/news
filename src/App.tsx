@@ -73,40 +73,7 @@ export default function App() {
             generateId: true
           });
 
-          // 3D Fill Extrusion Layer (Elevated Districts)
-          mapInstance.addLayer({
-            id: 'district-fills',
-            type: 'fill-extrusion',
-            source: 'districts',
-            paint: {
-              'fill-extrusion-color': [
-                'case',
-                ['boolean', ['feature-state', 'clicked'], false],
-                'rgba(52, 211, 153, 1)', // Solid click
-                ['boolean', ['feature-state', 'hover'], false],
-                'rgba(110, 231, 183, 0.83)', // 10% more transparent
-                'rgba(184, 245, 200, 0.88)'  // 5% more transparent
-              ],
-              'fill-extrusion-height': [
-                'case',
-                ['boolean', ['feature-state', 'clicked'], false],
-                10, 
-                ['boolean', ['feature-state', 'hover'], false],
-                5, 
-                1   // Almost flat base elevation
-              ],
-              'fill-extrusion-base': 0,
-              'fill-extrusion-opacity': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                6, 0.4,
-                10, 0.7
-              ] 
-            }
-          });
-
-          // District Shadows/Base - Now placed BELOW the fills to ground the cells
+          // District Shadows/Base - Placed BELOW the fills to ground the cells
           mapInstance.addLayer({
             id: 'district-base',
             type: 'line',
@@ -122,7 +89,51 @@ export default function App() {
               ],
               'line-opacity': 0.3 
             }
-          }, 'district-fills'); // Insert BEFORE fills to act as a base
+          });
+
+          // 3D Fill Extrusion Layer (Elevated Districts)
+          mapInstance.addLayer({
+            id: 'district-fills',
+            type: 'fill-extrusion',
+            source: 'districts',
+            paint: {
+              'fill-extrusion-color': [
+                'case',
+                ['boolean', ['feature-state', 'clicked'], false],
+                'rgba(52, 211, 153, 1)', // Solid click
+                ['boolean', ['feature-state', 'hover'], false],
+                'rgba(110, 231, 183, 0.83)', // 10% more transparent
+                'rgba(184, 245, 200, 0.88)'  // 5% more transparent
+              ],
+              'fill-extrusion-height': [
+                'interpolate',
+                ['exponential', 2],
+                ['zoom'],
+                6,
+                [
+                  'case',
+                  ['boolean', ['feature-state', 'clicked'], false], 1200,
+                  ['boolean', ['feature-state', 'hover'], false], 5,
+                  1
+                ],
+                10,
+                [
+                  'case',
+                  ['boolean', ['feature-state', 'clicked'], false], 75,
+                  ['boolean', ['feature-state', 'hover'], false], 5,
+                  1
+                ]
+              ],
+              'fill-extrusion-base': 0,
+              'fill-extrusion-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                6, 0.4,
+                10, 0.7
+              ] 
+            }
+          });
 
           // Removed district-shadows as fill-extrusion handles its own 3D volume
 
