@@ -163,7 +163,22 @@ export default function App() {
   const [isAnimating, setIsAnimating] = useState(false);
   const isAnimatingRef = useRef(false);
 
+  const [is3D, setIs3D] = useState(window.innerWidth >= 768);
   const [markerCoords, setMarkerCoords] = useState<{ lng: number; lat: number } | null>(null);
+
+  useEffect(() => {
+    if (!map.current) return;
+    if (is3D) {
+      map.current.easeTo({ pitch: 45, bearing: -10, duration: 1000 });
+      map.current.dragRotate.enable();
+      map.current.touchPitch.enable();
+    } else {
+      map.current.easeTo({ pitch: 0, bearing: 0, duration: 1000 });
+      map.current.dragRotate.disable();
+      map.current.touchPitch.disable();
+    }
+  }, [is3D]);
+
   const [activeFillColor, _setActiveFillColor] = useState(FILL_COLORS[0]);
   const activeFillColorRef = useRef(activeFillColor);
 
@@ -386,15 +401,18 @@ export default function App() {
           throw new Error("Invalid GeoJSON file.");
         }
 
+        const isPhone = window.innerWidth < 768;
         const mapInstance = new maplibregl.Map({
           container: mapContainer.current!,
           style: STYLES.light,
           center: [90.356, 23.685],
           zoom: 7,
-          pitch: 45,
-          bearing: -10,
+          pitch: isPhone ? 0 : 45,
+          bearing: isPhone ? 0 : -10,
           maxBounds: BANGLADESH_BOUNDS,
-          maxZoom: 13
+          maxZoom: 13,
+          dragRotate: !isPhone,
+          touchPitch: !isPhone
         });
 
         map.current = mapInstance;
@@ -441,13 +459,14 @@ export default function App() {
           setCoords(null);
         });
 
-        mapInstance.on('click', 'district-fills', async (e) => {
-          if (isAnimatingRef.current) return;
+        mapInstance.on('click', async (e) => {
+          if (isAnimatingRef.current || selectedDistrict || selectedNews || isSettingsOpen) return;
           
-          if (e.features && e.features.length > 0) {
+          const features = mapInstance.queryRenderedFeatures(e.point, { layers: ['district-fills'] });
+          if (features && features.length > 0) {
             isAnimatingRef.current = true;
             setIsAnimating(true);
-            const feature = e.features[0];
+            const feature = features[0];
             const props = feature.properties;
             const name = props?.NAME_4 || props?.NAME_2 || props?.NAME_1 || 'Unknown';
             const clickCoords = e.lngLat;
@@ -456,12 +475,9 @@ export default function App() {
             // STEP 1: FLY TO LOCATION
             mapInstance.stop(); 
             
-            // Force a visible "zoom out and in" arc by jumping to a wider view first
-            // This ensures the animation always plays even if already near the target
             const currentZoom = mapInstance.getZoom();
             const currentPitch = mapInstance.getPitch();
             
-            // If already zoomed in, we jump out first to trigger the 'majestic' flyTo
             if (currentZoom > 8.5) {
               mapInstance.jumpTo({
                 zoom: currentZoom - 1.5,
@@ -489,7 +505,6 @@ export default function App() {
               if (featureId !== null) {
                 mapInstance.setFeatureState({ source: 'districts', id: featureId }, { clicked: true });
                 
-                // Trigger the smooth lift animation (duration 1000ms)
                 mapInstance.setFilter('district-active-lift', ['==', ['id'], featureId]);
                 mapInstance.setPaintProperty('district-active-lift', 'fill-extrusion-height', 0);
                 setTimeout(() => {
@@ -525,7 +540,7 @@ export default function App() {
                     isAnimatingRef.current = false;
                     setIsAnimating(false);
                   }, 500);
-                }, 1300); // Wait for the flight and marker to finish
+                }, 1300);
               }, 800); 
             }, 400); 
           }
@@ -565,7 +580,10 @@ export default function App() {
     // Reverse tilt/zoom animation back to initial state
     if (map.current) {
       map.current.flyTo({
-        ...INITIAL_STATE,
+        center: [90.356, 23.685],
+        zoom: 7,
+        pitch: is3D ? 45 : 0,
+        bearing: is3D ? -10 : 0,
         duration: 1500,
         essential: true
       });
@@ -916,6 +934,27 @@ export default function App() {
                       </button>
                     </div>
 
+                    {/* Dimension Toggle - Mobile Only */}
+                    <div className="md:hidden space-y-6">
+                      <label className={`text-sm font-black uppercase tracking-widest opacity-40 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Map Dimension</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        <button 
+                          onClick={() => setIs3D(false)}
+                          className={`flex items-center justify-center gap-3 p-6 rounded-[32px] border-2 transition-all ${!is3D ? 'border-transparent text-black' : (theme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-gray-100 border-gray-200 text-gray-900')}`}
+                          style={!is3D ? { backgroundColor: activeFillColor.active } : {}}
+                        >
+                          <span className="font-bold uppercase tracking-widest">2D View</span>
+                        </button>
+                        <button 
+                          onClick={() => setIs3D(true)}
+                          className={`flex items-center justify-center gap-3 p-6 rounded-[32px] border-2 transition-all ${is3D ? 'border-transparent text-black' : (theme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-gray-100 border-gray-200 text-gray-900')}`}
+                          style={is3D ? { backgroundColor: activeFillColor.active } : {}}
+                        >
+                          <span className="font-bold uppercase tracking-widest">3D View</span>
+                        </button>
+                      </div>
+                    </div>
+
                     <div className="space-y-6">
                       <label className={`text-sm font-black uppercase tracking-widest opacity-40 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Interface theme</label>
                       <div className="grid grid-cols-2 gap-4">
@@ -1001,19 +1040,45 @@ export default function App() {
 
                     <div className="px-6 md:px-10 py-10 md:py-12">
                       {/* Compact Region Header */}
-                      <div className={`mb-10 p-6 md:p-10 rounded-[40px] border overflow-hidden relative shadow-2xl ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'}`}>
-                        {/* Background Image - Mobile: Cover, Desktop: Right Aligned */}
-                        <div className="absolute inset-0 z-0">
-                          <img 
-                            src={famousInfo?.image} 
-                            alt={selectedDistrict || ''} 
-                            className={`w-full h-full object-cover grayscale transition-all duration-700 pointer-events-none ${theme === 'dark' ? 'brightness-150 contrast-150' : 'brightness-110 contrast-110'}`} 
-                          />
-                          {/* Theme-based Overlay */}
-                          <div className={`absolute inset-0 backdrop-blur-[2px] ${theme === 'dark' ? 'bg-black/60' : 'bg-white/60'}`} />
-                          
-                          {/* Desktop Gradient Mask - only visible on md+ */}
-                          <div className={`absolute inset-0 hidden md:block ${theme === 'dark' ? 'bg-gradient-to-r from-black/80 via-black/40 to-transparent' : 'bg-gradient-to-r from-white/80 via-white/40 to-transparent'}`} />
+                      <div className={`mb-10 p-6 md:p-10 rounded-[40px] border overflow-hidden relative shadow-2xl ${theme === 'dark' ? 'bg-black/40 border-white/10' : 'bg-white/40 border-black/10'} md:bg-transparent`}>
+                        {/* Background Container */}
+                        <div className="absolute inset-0 z-0 overflow-hidden">
+                          {/* Mobile Background - same as before */}
+                          <div className="md:hidden absolute inset-0">
+                            {/* Dotted Pattern for mobile too */}
+                            <div className={`absolute inset-0 pointer-events-none opacity-[0.1] z-10 ${theme === 'dark' ? 'text-white' : 'text-black'}`} style={{ backgroundImage: 'radial-gradient(circle, currentColor 1.5px, transparent 1.5px)', backgroundSize: '18px 18px' }} />
+                            <img 
+                              src={famousInfo?.image} 
+                              alt="" 
+                              className="w-full h-full object-cover grayscale opacity-40 blur-[1px]" 
+                            />
+                            <div className={`absolute inset-0 backdrop-blur-[1px] ${theme === 'dark' ? 'bg-black/60' : 'bg-white/60'}`} />
+                          </div>
+
+                          {/* Desktop Background: Majestic blurred solid fading to dotted image */}
+                          <div className="hidden md:flex absolute inset-0">
+                            {/* Solid Left Part */}
+                            <div className={`flex-grow h-full ${theme === 'dark' ? 'bg-black/90' : 'bg-white/95'} backdrop-blur-3xl`} />
+                            
+                            {/* Transition and Dotted Right Part */}
+                            <div className="w-1/2 h-full relative">
+                              {/* Background pattern and image */}
+                              <div className="absolute inset-0 z-0">
+                                <img 
+                                  src={famousInfo?.image} 
+                                  alt="" 
+                                  className={`w-full h-full object-cover grayscale transition-all duration-700 ${theme === 'dark' ? 'brightness-125 contrast-125 opacity-30' : 'brightness-110 contrast-110 opacity-20'}`} 
+                                />
+                                <div className={`absolute inset-0 pointer-events-none opacity-[0.2] z-10 ${theme === 'dark' ? 'text-white' : 'text-black'}`} style={{ backgroundImage: 'radial-gradient(circle, currentColor 2px, transparent 2px)', backgroundSize: '18px 18px' }} />
+                                
+                                {/* Gradual Blur Overlay: Blurs the dots/image as it goes left */}
+                                <div className={`absolute inset-0 z-20 backdrop-blur-sm ${theme === 'dark' ? 'bg-gradient-to-r from-black via-black/80 to-transparent' : 'bg-gradient-to-r from-white via-white/80 to-transparent'}`} />
+                              </div>
+                              
+                              {/* Connector to the solid part */}
+                              <div className={`absolute inset-y-0 -left-1 w-24 z-30 ${theme === 'dark' ? 'bg-gradient-to-r from-black to-transparent' : 'bg-gradient-to-r from-white/95 to-transparent'}`} />
+                            </div>
+                          </div>
                         </div>
 
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
@@ -1021,7 +1086,7 @@ export default function App() {
                             <h1 className={`text-4xl md:text-5xl font-black tracking-tighter leading-none ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                               {selectedDistrict}
                             </h1>
-                            <div className={`flex items-center gap-2 text-[10px] font-black font-mono uppercase tracking-[0.2em] opacity-60 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                            <div className={`flex items-center gap-2 text-[10px] font-black font-mono uppercase tracking-[0.2em] opacity-80 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                               <MapPin size={10} />
                               <div className="line-clamp-1">{famousInfo?.place} • {markerCoords?.lat}N, {markerCoords?.lng}E</div>
                             </div>
