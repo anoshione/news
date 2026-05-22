@@ -32,59 +32,55 @@ interface NewsItem {
   imageUrl: string;
 }
 
-const MOCK_NEWS: Record<string, NewsItem[]> = {
-  'Dhaka': [
-    { 
-      id: 'd1', 
-      title: 'New Metro Rail Route Planned', 
-      summary: 'The government has approved a new route connecting North and South Dhaka to ease traffic.', 
-      content: 'In a significant move to tackle the perennial traffic congestion in the capital, the government has officially approved the construction of Metro Rail Line-5. This new route is designed to connect the northern and southern hubs of Dhaka, spanning approximately 20 kilometers. The project, which is part of the Strategic Transport Plan, is expected to serve over 500,000 commuters daily once completed. Construction is slated to begin by late 2024, with a target completion date of 2030. Experts believe this will revolutionize urban mobility in Bangladesh.',
-      category: 'Economy', 
-      date: '2 hours ago', 
-      imageUrl: 'https://images.unsplash.com/photo-1590133325985-7973c683b794' 
-    },
-    { 
-      id: 'd2', 
-      title: 'Puran Dhaka Food Festival Starts', 
-      summary: 'Witness the traditional flavors of old Dhaka this weekend at Rabindra Sarobar.', 
-      content: 'The aroma of Biryani, Bakarkhani, and Kebabs filled the air today as the annual Puran Dhaka Food Festival kicked off in the heart of the capital. This three-day extravaganza aims to celebrate the rich culinary heritage of old Dhaka, bringing together legendary master chefs and food enthusiasts from across the country. Visitors can enjoy over 100 stalls offering authentic delicacies that have been passed down through generations. Cultural performances including local folk music and traditional dances are also scheduled throughout the event.',
-      category: 'Culture', 
-      date: '5 hours ago', 
-      imageUrl: 'https://images.unsplash.com/photo-1512132411229-c30391241dd8' 
-    }
-  ],
-  'Chittagong': [
-    { 
-      id: 'c1', 
-      title: 'Port Expansion Hits New Milestone', 
-      summary: 'Chittagong port reports record-breaking cargo handling capacity this quarter.', 
-      content: 'The Chittagong Port Authority (CPA) has announced that the port handled a record 3.2 million TEUs of containers in the last fiscal year, marking a 5% growth. This milestone is attributed to the recent automation of the terminal management system and the addition of four new gantry cranes. The authority is now pushing forward with the Bay Terminal project, which will further increase capacity and allow larger vessels to dock. This expansion is critical for maintaining Bangladesh\'s status as a regional trade hub.',
-      category: 'Economy', 
-      date: '1 day ago', 
-      imageUrl: 'https://images.unsplash.com/photo-1588661136423-f36bc9327896' 
-    },
-    { 
-      id: 'c2', 
-      title: 'Hill Tracts Conservation Project', 
-      summary: 'New initiative launched to protect the biodiversity of Chittagong Hill Tracts.', 
-      content: 'A new community-led conservation project has been launched in the Chittagong Hill Tracts to protect endangered species and their habitats. The initiative, funded by international environmental agencies, focuses on reforesting degraded areas and establishing wildlife corridors. Local indigenous communities are being trained as forest rangers and eco-guides, providing them with alternative livelihoods while ensuring the long-term sustainability of the region\'s unique biodiversity. Early reports indicate a promising return of several rare bird species to the area.',
-      category: 'Environment', 
-      date: '3 days ago', 
-      imageUrl: 'https://images.unsplash.com/photo-1544735038-179ad682ee71' 
-    }
-  ],
-  'Sylhet': [
-    { 
-      id: 's1', 
-      title: 'Tea Harvest Reaches Peak', 
-      summary: 'Farmers in Sylhet anticipate a bumper crop of high-quality tea leaves this season.', 
-      content: 'The tea estates of Sylhet are buzzing with activity as the peak harvest season arrives. Favorable weather conditions, including timely rainfall and moderate sunlight, have led to an exceptional growth of high-quality tea leaves. Estate managers are optimistic that this year\'s yield will surpass previous records, both in quantity and quality. The Surma Valley is leading the production, with several gardens already reporting a 15% increase in harvest compared to last year. Efforts are also being made to improve the living standards of tea workers through various welfare schemes.',
-      category: 'Economy', 
-      date: '12 hours ago', 
-      imageUrl: 'https://images.unsplash.com/photo-1594243603415-46ffcf1b29ed' 
-    }
-  ]
-};
+const NEWS_TEMPLATES: NewsItem[] = [
+  { 
+    id: 't1', 
+    title: 'Eco-Green Corridor Project', 
+    summary: 'A new initiative to create sustainable green spaces across urban areas.', 
+    content: 'The government has announced a major shift towards urban sustainability with the Eco-Green Corridor Project. This plan involves planting thousands of native trees and creating pedestrian-friendly green zones. The initiative aims to reduce urban heat island effects and improve the overall air quality for millions of citizens. Experts suggest this could serve as a global model for sustainable city planning.',
+    category: 'Environment', 
+    date: '3 hours ago', 
+    imageUrl: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e' 
+  },
+  { 
+    id: 't2', 
+    title: 'Small Business Empowerment Grant', 
+    summary: 'New financial aid packages unveiled for local startups and traditional artisans.', 
+    content: 'In an effort to bolster the local economy, a new grant program has been launched specifically targeting small-scale entrepreneurs and traditional artisans. The program provides low-interest loans and technical training to help modernize production while preserving traditional techniques. Over 5,000 businesses are expected to benefit in the first phase of implementation.',
+    category: 'Economy', 
+    date: '6 hours ago', 
+    imageUrl: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0' 
+  },
+  { 
+    id: 't3', 
+    title: 'Digital Literacy Drive in Rural Areas', 
+    summary: 'Mobile learning centers to reach the remotest parts of the country.', 
+    content: 'A nationwide campaign to bridge the digital divide has kicked off today. Mobile learning hubs equipped with high-speed satellite internet and tablets are being deployed to rural schools. The curriculum focuses on essential digital skills, online safety, and coding. This initiative is part of the larger vision to ensure every citizen has the tools to succeed in a digital economy.',
+    category: 'Education', 
+    date: '1 day ago', 
+    imageUrl: 'https://images.unsplash.com/photo-1509062522246-3755977927d7' 
+  },
+  { 
+    id: 't4', 
+    title: 'New Health Infrastructure Landmark', 
+    summary: 'Modern specialized hospital facility inaugurated to provide world-class care.', 
+    content: 'A state-of-the-art multi-specialty hospital was inaugurated today, promising to provide advanced medical treatments at subsidized rates. The facility features cutting-edge diagnostic tools and a dedicated research wing. This development is expected to significantly reduce the need for citizens to travel abroad for complex medical procedures.',
+    category: 'Health', 
+    date: '2 days ago', 
+    imageUrl: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce2' 
+  },
+  { 
+    id: 't5', 
+    title: 'Heritage Revitalization Festival', 
+    summary: 'Thousands gather to celebrate centuries-old traditions and folk arts.', 
+    content: 'The historic district came alive today with the sounds and colors of the Heritage Revitalization Festival. The event showcases centuries-old folk music, traditional dance forms, and indigenous crafts. Organizers hope to inspire the younger generation to take pride in their cultural roots and preserve these vanishing art forms for the future.',
+    category: 'Culture', 
+    date: '3 days ago', 
+    imageUrl: 'https://images.unsplash.com/photo-1532375810709-75b1da00537c' 
+  }
+];
+
+const MOCK_NEWS: Record<string, NewsItem[]> = {};
 
 const DEFAULT_NEWS: NewsItem[] = [
   { 
@@ -163,7 +159,7 @@ export default function App() {
   const [isAnimating, setIsAnimating] = useState(false);
   const isAnimatingRef = useRef(false);
 
-  const [is3D, setIs3D] = useState(window.innerWidth >= 768);
+  const [is3D, setIs3D] = useState(false);
   const [markerCoords, setMarkerCoords] = useState<{ lng: number; lat: number } | null>(null);
 
   useEffect(() => {
@@ -244,7 +240,9 @@ export default function App() {
 
   useEffect(() => {
     if (!map.current) return;
-    if (selectedDistrict || isSettingsOpen || selectedNews) {
+    const isOptimized = !!(selectedDistrict || isSettingsOpen || selectedNews || isAnimating);
+    
+    if (isOptimized) {
       map.current.scrollZoom.disable();
       map.current.boxZoom.disable();
       map.current.dragRotate.disable();
@@ -261,89 +259,133 @@ export default function App() {
       map.current.doubleClickZoom.enable();
       map.current.touchZoomRotate.enable();
     }
-  }, [selectedDistrict, isSettingsOpen, selectedNews]);
+
+    // Performance Optimization: Hide heavy details during animation or when overlays are active
+    const toggleHeavyLayers = () => {
+      if (!map.current || !map.current.isStyleLoaded()) return;
+      try {
+        const style = map.current.getStyle();
+        if (!style || !style.layers) return;
+        
+        const heavyKeywords = ['label', 'poi', 'building', 'transit', 'place', 'water-label', 'road', 'symbol'];
+        style.layers.forEach(layer => {
+          if (!layer.id.includes('district')) {
+            const isHeavy = heavyKeywords.some(k => layer.id.toLowerCase().includes(k));
+            if (isHeavy) {
+              map.current?.setLayoutProperty(layer.id, 'visibility', isOptimized ? 'none' : 'visible');
+            }
+          }
+        });
+      } catch (e) {
+        console.warn('Map optimization failed', e);
+      }
+    };
+
+    toggleHeavyLayers();
+    // Also re-apply optimization if style reloads
+    map.current.on('styledata', toggleHeavyLayers);
+    return () => {
+      map.current?.off('styledata', toggleHeavyLayers);
+    };
+  }, [selectedDistrict, isSettingsOpen, selectedNews, isAnimating]);
 
   const setupLayers = (mapInstance: maplibregl.Map) => {
     if (!districtsDataRef.current) return;
     
-    if (mapInstance.getSource('districts') && mapInstance.getLayer('district-fills')) {
-      if (mapInstance.getLayer('district-active-fill')) {
-        mapInstance.removeLayer('district-active-fill');
-      }
-      const color = activeFillColorRef.current;
-      mapInstance.setPaintProperty('district-fills', 'fill-extrusion-color', [
-        'case',
-        ['any', ['boolean', ['feature-state', 'clicked'], false], ['boolean', ['feature-state', 'hover'], false]],
-        color.active,
-        color.base
-      ]);
-      
-      // Update the active lift layer color to follow the theme
-      if (mapInstance.getLayer('district-active-lift')) {
-        mapInstance.setPaintProperty('district-active-lift', 'fill-extrusion-color', color.active);
-      }
+    const currColor = activeFillColorRef.current;
+    const isLight = themeRef.current === 'light';
 
-      // Update the neon glow color to follow the theme
-      if (mapInstance.getLayer('district-neon-glow')) {
-        mapInstance.setPaintProperty('district-neon-glow', 'line-color', color.active);
-      }
-      return;
+    // 1. Ensure Source
+    if (!mapInstance.getSource('districts')) {
+      mapInstance.addSource('districts', {
+        type: 'geojson',
+        data: districtsDataRef.current,
+        generateId: true
+      });
     }
 
-    mapInstance.addSource('districts', {
-      type: 'geojson',
-      data: districtsDataRef.current,
-      generateId: true
-    });
+    // 2. Base Borders
+    if (!mapInstance.getLayer('district-base')) {
+      mapInstance.addLayer({
+        id: 'district-base',
+        type: 'line',
+        source: 'districts',
+        paint: {
+          'line-color': isLight ? '#cbd5e1' : '#334155',
+          'line-width': ['interpolate', ['linear'], ['zoom'], 6, 0.5, 10, 2],
+          'line-opacity': 0.3
+        }
+      });
+    }
 
-    const isLight = themeRef.current === 'light';
-    mapInstance.addLayer({
-      id: 'district-base',
-      type: 'line',
-      source: 'districts',
-      paint: {
-        'line-color': isLight ? '#cbd5e1' : '#334155',
-        'line-width': ['interpolate', ['linear'], ['zoom'], 6, 0.5, 10, 2],
-        'line-opacity': 0.3
-      }
-    });
+    // 3. Heatmap Layers (using multiple layers because fill-extrusion-opacity doesn't support data expressions)
+    const densities = [
+      { id: 'district-fills-0', counts: [0], opacity: 0.05 },
+      { id: 'district-fills-1', counts: [1], opacity: 0.1 },
+      { id: 'district-fills-2', counts: [2, 3, 4], opacity: 0.2 },
+      { id: 'district-fills-3', counts: [5], opacity: 0.3 }
+    ];
 
-    const currColor = activeFillColorRef.current;
-    mapInstance.addLayer({
-      id: 'district-fills',
-      type: 'fill-extrusion',
-      source: 'districts',
-      paint: {
+    densities.forEach(d => {
+      const paintProps = {
         'fill-extrusion-color': [
           'case',
-          ['any', ['boolean', ['feature-state', 'clicked'], false], ['boolean', ['feature-state', 'hover'], false]],
+          ['boolean', ['feature-state', 'hover'], false],
           currColor.active,
           currColor.base
         ],
         'fill-extrusion-height': ['case', ['boolean', ['feature-state', 'hover'], false], 40, 0],
         'fill-extrusion-base': 0,
-        'fill-extrusion-opacity': 0.2,
+        'fill-extrusion-opacity': d.opacity,
         'fill-extrusion-height-transition': { duration: 400, delay: 0 }
+      };
+
+      // Construction of filter: ['match', ['get', 'newsCount'], 2, true, 3, true, 4, true, false]
+      const filterExpression: any[] = ['match', ['get', 'newsCount']];
+      d.counts.forEach(count => {
+        filterExpression.push(count, true);
+      });
+      filterExpression.push(false);
+
+      if (mapInstance.getLayer(d.id)) {
+        mapInstance.setPaintProperty(d.id, 'fill-extrusion-color', paintProps['fill-extrusion-color']);
+        mapInstance.setPaintProperty(d.id, 'fill-extrusion-height', paintProps['fill-extrusion-height']);
+        mapInstance.setPaintProperty(d.id, 'fill-extrusion-opacity', d.opacity);
+        mapInstance.setFilter(d.id, filterExpression);
+        return;
       }
+      mapInstance.addLayer({
+        id: d.id,
+        type: 'fill-extrusion',
+        source: 'districts',
+        paint: paintProps,
+        filter: filterExpression
+      });
     });
 
-    // Dedicated layer for the "Slow Lift" animation
-    mapInstance.addLayer({
-      id: 'district-active-lift',
-      type: 'fill-extrusion',
-      source: 'districts',
-      paint: {
-        'fill-extrusion-color': currColor.active,
-        'fill-extrusion-height': 0,
-        'fill-extrusion-base': 0,
-        'fill-extrusion-opacity': 0.5,
-        'fill-extrusion-height-transition': { duration: 1000, delay: 0 }
-      },
-      filter: ['==', ['id'], -1]
-    }, 'district-fills');
+    // 4. (Removed district-hover as it caused filter errors with feature-state)
 
-    // Add glowing active highlight layer
-    if (mapInstance.getLayer('district-fills')) {
+    // 5. Active Lift Layer (Clicked State)
+    if (!mapInstance.getLayer('district-active-lift')) {
+      mapInstance.addLayer({
+        id: 'district-active-lift',
+        type: 'fill-extrusion',
+        source: 'districts',
+        paint: {
+          'fill-extrusion-color': currColor.active,
+          'fill-extrusion-height': 0,
+          'fill-extrusion-base': 0,
+          'fill-extrusion-opacity': 0.5,
+          'fill-extrusion-height-transition': { duration: 1000, delay: 0 }
+        },
+        filter: ['==', ['id'], -1]
+      });
+    } else {
+      mapInstance.setPaintProperty('district-active-lift', 'fill-extrusion-color', currColor.active);
+    }
+
+    // 6. Neon Glow
+    if (!mapInstance.getLayer('district-neon-glow')) {
       mapInstance.addLayer({
         id: 'district-neon-glow',
         type: 'line',
@@ -354,7 +396,9 @@ export default function App() {
           'line-blur': 10,
           'line-opacity': 0.6
         }
-      }, 'district-fills');
+      });
+    } else {
+      mapInstance.setPaintProperty('district-neon-glow', 'line-color', currColor.active);
     }
   };
 
@@ -373,7 +417,7 @@ export default function App() {
       }
       setupLayers(map.current);
     }
-  }, [activeFillColor]);
+  }, [activeFillColor, theme]);
 
   useEffect(() => {
     if (map.current || !mapContainer.current) return;
@@ -388,12 +432,34 @@ export default function App() {
           districtsDataRef.current = {
             ...rawData,
             features: rawData.features.map((f: any, idx: number) => {
-              const featureWithId = { ...f, id: idx };
+              const featureId = idx;
+              const name = f.properties?.NAME_4 || f.properties?.NAME_2 || f.properties?.NAME_1 || 'Unknown';
+              
+              // Assign random news density (0-5)
+              const newsCount = Math.floor(Math.random() * 6);
+              const shuffledTemplates = [...NEWS_TEMPLATES].sort(() => 0.5 - Math.random());
+              const districtNews = shuffledTemplates.slice(0, newsCount).map(n => ({
+                ...n,
+                id: `${n.id}-${featureId}` // Make IDs unique per district
+              }));
+              
+              // Store news in MOCK_NEWS by name for retrieval
+              MOCK_NEWS[name] = districtNews;
+
+              const featureWithProperties = { 
+                ...f, 
+                id: featureId, 
+                properties: { 
+                  ...f.properties, 
+                  newsCount: newsCount 
+                } 
+              };
+
               try {
-                const buffered = turf.buffer(featureWithId, -0.1, { units: 'kilometers' });
-                return buffered ? { ...buffered, id: idx } : featureWithId;
+                const buffered = turf.buffer(featureWithProperties, -0.1, { units: 'kilometers' });
+                return buffered ? { ...buffered, id: featureId } : featureWithProperties;
               } catch (e) {
-                return featureWithId;
+                return featureWithProperties;
               }
             })
           };
@@ -436,7 +502,9 @@ export default function App() {
 
         let hoveredId: string | number | null = null;
 
-        mapInstance.on('mousemove', 'district-fills', (e) => {
+        const HEATMAP_LAYERS = ['district-fills-0', 'district-fills-1', 'district-fills-2', 'district-fills-3'];
+
+        mapInstance.on('mousemove', HEATMAP_LAYERS, (e) => {
           setMousePos({ x: e.point.x, y: e.point.y });
           if (e.lngLat) {
             setCoords({ lng: Number(e.lngLat.lng.toFixed(4)), lat: Number(e.lngLat.lat.toFixed(4)) });
@@ -452,7 +520,7 @@ export default function App() {
           }
         });
 
-        mapInstance.on('mouseleave', 'district-fills', () => {
+        mapInstance.on('mouseleave', HEATMAP_LAYERS, () => {
           if (hoveredId !== null) mapInstance.setFeatureState({ source: 'districts', id: hoveredId }, { hover: false });
           hoveredId = null;
           setHoveredName(null);
@@ -462,7 +530,7 @@ export default function App() {
         mapInstance.on('click', async (e) => {
           if (isAnimatingRef.current || selectedDistrict || selectedNews || isSettingsOpen) return;
           
-          const features = mapInstance.queryRenderedFeatures(e.point, { layers: ['district-fills'] });
+          const features = mapInstance.queryRenderedFeatures(e.point, { layers: HEATMAP_LAYERS });
           if (features && features.length > 0) {
             isAnimatingRef.current = true;
             setIsAnimating(true);
@@ -472,31 +540,31 @@ export default function App() {
             const clickCoords = e.lngLat;
             const featureId = feature.id ?? null;
 
-            // STEP 1: FLY TO LOCATION
-            mapInstance.stop(); 
-            
-            const currentZoom = mapInstance.getZoom();
-            const currentPitch = mapInstance.getPitch();
-            
-            if (currentZoom > 8.5) {
-              mapInstance.jumpTo({
-                zoom: currentZoom - 1.5,
-                pitch: Math.max(0, currentPitch - 20)
-              });
-            }
-
-            mapInstance.flyTo({ 
-              center: clickCoords, 
-              zoom: 10, 
-              pitch: 65, 
-              bearing: -5,
-              duration: 2200, 
-              essential: true,
-              curve: 2.2, 
-              speed: 0.7
+            // STEP 1: SMOOTH PAN AND FLY
+            // Start a subtle pan to lead the eye
+            mapInstance.easeTo({
+              center: clickCoords,
+              duration: 1000,
+              easing: (t) => t * (2 - t)
             });
 
-            // STEP 2: START LIFTING EARLY IN THE FLY (400ms)
+            // Execute the cinematic zoom and tilt animation
+            setTimeout(() => {
+              if (map.current) {
+                map.current.flyTo({ 
+                  center: clickCoords, 
+                  zoom: 10, 
+                  pitch: 65, 
+                  bearing: -5,
+                  duration: 2500, 
+                  essential: true,
+                  curve: 1.2, 
+                  speed: 0.4
+                });
+              }
+            }, 300);
+
+            // STEP 2: START LIFTING EARLY IN THE FLY
             setTimeout(() => {
               if (clickedIdRef.current !== null) {
                 mapInstance.setFeatureState({ source: 'districts', id: clickedIdRef.current }, { clicked: false });
@@ -569,52 +637,57 @@ export default function App() {
     isAnimatingRef.current = true;
     setIsAnimating(true);
 
+    // 1. Start UI exit
     setSelectedDistrict(null);
     setSearchQuery('');
-    setMarkerCoords(null);
-    if (marker.current) {
-      marker.current.remove();
-      marker.current = null;
-    }
+    setGeocodedResults([]);
     
-    // Reverse tilt/zoom animation back to initial state
+    // 2. Clear marker with a slight delay so it doesn't just disappear instantly
+    // but also doesn't stay too long when we fly away
+    setTimeout(() => {
+      if (marker.current) {
+        marker.current.remove();
+        marker.current = null;
+      }
+      setMarkerCoords(null);
+    }, 400);
+
+    // 3. Map Instance logic
     if (map.current) {
-      map.current.flyTo({
+      const mapInstance = map.current;
+      
+      // Start lowering the lifted cell early
+      if (clickedIdRef.current !== null) {
+        mapInstance.setPaintProperty('district-active-lift', 'fill-extrusion-height', 0);
+      }
+
+      // Smooth cinematic flight back to base vision
+      mapInstance.flyTo({
         center: [90.356, 23.685],
         zoom: 7,
         pitch: is3D ? 45 : 0,
         bearing: is3D ? -10 : 0,
-        duration: 1500,
+        duration: 2200,
+        curve: 1.1,
+        speed: 0.45,
         essential: true
       });
-      
-      // Clear clicked state from features
-      if (clickedIdRef.current !== null) {
-        map.current.setFeatureState(
-          { source: 'districts', id: clickedIdRef.current },
-          { clicked: false }
-        );
-        
-        // Lower the lifted cell smoothly
-        map.current.setPaintProperty('district-active-lift', 'fill-extrusion-height', 0);
-        
-        setTimeout(() => {
-          if (map.current) {
-            map.current.setFilter('district-active-lift', ['==', ['id'], -1]);
-            // Re-enable interaction after map settles
-            isAnimatingRef.current = false;
-            setIsAnimating(false);
-          }
-        }, 1500);
 
-        clickedIdRef.current = null;
-      } else {
-        // Fallback if no district was active
-        setTimeout(() => {
+      // 4. Final state cleanup once animations are settled
+      setTimeout(() => {
+        if (map.current) {
+          if (clickedIdRef.current !== null) {
+            map.current.setFeatureState(
+              { source: 'districts', id: clickedIdRef.current },
+              { clicked: false }
+            );
+            map.current.setFilter('district-active-lift', ['==', ['id'], -1]);
+            clickedIdRef.current = null;
+          }
           isAnimatingRef.current = false;
           setIsAnimating(false);
-        }, 1500);
-      }
+        }
+      }, 2300);
     } else {
       isAnimatingRef.current = false;
       setIsAnimating(false);
@@ -697,31 +770,31 @@ export default function App() {
     }
 
     const mapInstance = map.current;
-    mapInstance.stop();
-
-    // Arc logic
-    const currentZoom = mapInstance.getZoom();
-    const currentPitch = mapInstance.getPitch();
-    if (currentZoom > 8.5) {
-      mapInstance.jumpTo({
-        zoom: currentZoom - 1.5,
-        pitch: Math.max(0, currentPitch - 20)
-      });
-    }
-
-    // Step 1: Fly
-    mapInstance.flyTo({ 
-      center: center, 
-      zoom: 10, 
-      pitch: 65, 
-      bearing: -5,
-      duration: 2200, 
-      essential: true,
-      curve: 2.2, 
-      speed: 0.7
+    
+    // STEP 1: Smoothly pan to the center first
+    mapInstance.easeTo({
+      center: center,
+      duration: 1000,
+      easing: (t) => t * (2 - t)
     });
 
-    // Step 2: Lift Cell (400ms)
+    // STEP 2: Execute cinematic fly
+    setTimeout(() => {
+      if (map.current) {
+        map.current.flyTo({ 
+          center: center, 
+          zoom: 10, 
+          pitch: 65, 
+          bearing: -5,
+          duration: 2500, 
+          essential: true,
+          curve: 1.2, 
+          speed: 0.4
+        });
+      }
+    }, 300);
+
+    // STEP 3: Lift Cell
     setTimeout(() => {
       const featureId = matchingFeature?.id ?? null;
       if (clickedIdRef.current !== null) {
@@ -777,7 +850,7 @@ export default function App() {
   };
 
   const filteredNews = useMemo(() => {
-    let news = selectedDistrict ? (MOCK_NEWS[selectedDistrict] || DEFAULT_NEWS) : DEFAULT_NEWS;
+    let news = selectedDistrict ? (MOCK_NEWS[selectedDistrict] || []) : DEFAULT_NEWS;
     
     if (selectedCategory) {
       news = news.filter(n => n.category === selectedCategory);
@@ -802,7 +875,7 @@ export default function App() {
 
   return (
     <div className={`relative w-full h-screen font-sans overflow-hidden transition-colors duration-500 ${theme === 'dark' ? 'bg-[#060606]' : 'bg-[#f8fafc]'}`}>
-      <div id="map" ref={mapContainer} className={`absolute inset-0 w-full h-full transition-all duration-500 ${selectedDistrict || isSettingsOpen || selectedNews || isAnimating ? 'pointer-events-none opacity-80' : ''}`} />
+      <div id="map" ref={mapContainer} className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${selectedDistrict || isSettingsOpen || selectedNews ? 'opacity-80' : 'opacity-100'} ${selectedDistrict || isSettingsOpen || selectedNews || isAnimating ? 'pointer-events-none' : ''}`} />
       
       {/* Search Bar - Fixed Top */}
       <div className="absolute top-0 left-0 w-full z-40 p-4 md:p-10 pointer-events-none">
@@ -959,7 +1032,11 @@ export default function App() {
                       <label className={`text-sm font-black uppercase tracking-widest opacity-40 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Interface theme</label>
                       <div className="grid grid-cols-2 gap-4">
                         <button 
-                          onClick={() => { setTheme('light'); if (map.current) map.current.setStyle(STYLES.light); }}
+                          onClick={() => { 
+                            setTheme('light'); 
+                            themeRef.current = 'light';
+                            if (map.current) map.current.setStyle(STYLES.light); 
+                          }}
                           className={`flex items-center justify-center gap-3 p-6 rounded-[32px] border-2 transition-all ${theme === 'light' ? 'border-transparent text-black' : (theme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-gray-100 border-gray-200 text-gray-900')}`}
                           style={theme === 'light' ? { backgroundColor: activeFillColor.active } : {}}
                         >
@@ -967,7 +1044,11 @@ export default function App() {
                           <span className="font-bold">Light Mode</span>
                         </button>
                         <button 
-                          onClick={() => { setTheme('dark'); if (map.current) map.current.setStyle(STYLES.dark); }}
+                          onClick={() => { 
+                            setTheme('dark'); 
+                            themeRef.current = 'dark';
+                            if (map.current) map.current.setStyle(STYLES.dark); 
+                          }}
                           className={`flex items-center justify-center gap-3 p-6 rounded-[32px] border-2 transition-all ${theme === 'dark' ? 'border-transparent text-black' : (theme === 'light' ? 'bg-gray-100 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white')}`}
                           style={theme === 'dark' ? { backgroundColor: activeFillColor.active } : {}}
                         >
@@ -1040,13 +1121,13 @@ export default function App() {
 
                     <div className="px-6 md:px-10 py-10 md:py-12">
                       {/* Compact Region Header */}
-                      <div className={`mb-10 p-6 md:p-10 rounded-[40px] border overflow-hidden relative shadow-2xl ${theme === 'dark' ? 'bg-black/40 border-white/10' : 'bg-white/40 border-black/10'} md:bg-transparent`}>
+                      <div className={`mb-10 p-6 md:p-10 rounded-[40px] border overflow-hidden relative shadow-2xl ${theme === 'dark' ? 'bg-[#0a0a0a]/95 border-white/10' : 'bg-white/95 border-black/5'}`}>
                         {/* Background Container */}
-                        <div className="absolute inset-0 z-0 overflow-hidden">
-                          {/* Mobile Background - same as before */}
+                        <div className="absolute inset-0 z-0 pointer-events-none select-none">
+                          {/* Mobile Background */}
                           <div className="md:hidden absolute inset-0">
-                            {/* Dotted Pattern for mobile too */}
-                            <div className={`absolute inset-0 pointer-events-none opacity-[0.1] z-10 ${theme === 'dark' ? 'text-white' : 'text-black'}`} style={{ backgroundImage: 'radial-gradient(circle, currentColor 1.5px, transparent 1.5px)', backgroundSize: '18px 18px' }} />
+                            {/* Dotted Pattern for mobile */}
+                            <div className={`absolute inset-0 opacity-[0.1] z-10 ${theme === 'dark' ? 'text-white' : 'text-black'}`} style={{ backgroundImage: 'radial-gradient(circle, currentColor 1.5px, transparent 1.5px)', backgroundSize: '18px 18px' }} />
                             <img 
                               src={famousInfo?.image} 
                               alt="" 
@@ -1055,29 +1136,24 @@ export default function App() {
                             <div className={`absolute inset-0 backdrop-blur-[1px] ${theme === 'dark' ? 'bg-black/60' : 'bg-white/60'}`} />
                           </div>
 
-                          {/* Desktop Background: Majestic blurred solid fading to dotted image */}
-                          <div className="hidden md:flex absolute inset-0">
-                            {/* Solid Left Part */}
-                            <div className={`flex-grow h-full ${theme === 'dark' ? 'bg-black/90' : 'bg-white/95'} backdrop-blur-3xl`} />
-                            
-                            {/* Transition and Dotted Right Part */}
-                            <div className="w-1/2 h-full relative">
-                              {/* Background pattern and image */}
-                              <div className="absolute inset-0 z-0">
-                                <img 
-                                  src={famousInfo?.image} 
-                                  alt="" 
-                                  className={`w-full h-full object-cover grayscale transition-all duration-700 ${theme === 'dark' ? 'brightness-125 contrast-125 opacity-30' : 'brightness-110 contrast-110 opacity-20'}`} 
-                                />
-                                <div className={`absolute inset-0 pointer-events-none opacity-[0.2] z-10 ${theme === 'dark' ? 'text-white' : 'text-black'}`} style={{ backgroundImage: 'radial-gradient(circle, currentColor 2px, transparent 2px)', backgroundSize: '18px 18px' }} />
-                                
-                                {/* Gradual Blur Overlay: Blurs the dots/image as it goes left */}
-                                <div className={`absolute inset-0 z-20 backdrop-blur-sm ${theme === 'dark' ? 'bg-gradient-to-r from-black via-black/80 to-transparent' : 'bg-gradient-to-r from-white via-white/80 to-transparent'}`} />
-                              </div>
+                          {/* Desktop Background Layered Approach */}
+                          <div className="hidden md:block absolute inset-0 overflow-hidden">
+                            {/* The Image Part (Right Side) */}
+                            <div className="absolute top-0 right-0 w-3/5 h-full overflow-hidden">
+                              <img 
+                                src={famousInfo?.image} 
+                                alt="" 
+                                className={`w-full h-full object-cover grayscale transition-all duration-700 ${theme === 'dark' ? 'brightness-125 contrast-125 opacity-30 px-10' : 'brightness-110 contrast-110 opacity-20 px-10'}`} 
+                              />
+                              {/* Dotted Overlay */}
+                              <div className={`absolute inset-0 opacity-[0.2] z-10 ${theme === 'dark' ? 'text-white' : 'text-black'}`} style={{ backgroundImage: 'radial-gradient(circle, currentColor 2px, transparent 2px)', backgroundSize: '18px 18px' }} />
                               
-                              {/* Connector to the solid part */}
-                              <div className={`absolute inset-y-0 -left-1 w-24 z-30 ${theme === 'dark' ? 'bg-gradient-to-r from-black to-transparent' : 'bg-gradient-to-r from-white/95 to-transparent'}`} />
+                              {/* Fade out the image as it goes left */}
+                              <div className={`absolute inset-0 z-20 ${theme === 'dark' ? 'bg-gradient-to-r from-black via-black/40 to-transparent' : 'bg-gradient-to-r from-white via-white/40 to-transparent'}`} />
                             </div>
+                            
+                            {/* Subtle Texture Overlay for entire banner */}
+                            <div className={`absolute inset-0 z-[5] opacity-[0.03] ${theme === 'dark' ? 'invert' : ''}`} style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
                           </div>
                         </div>
 
