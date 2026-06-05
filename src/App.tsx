@@ -30,6 +30,7 @@ interface NewsItem {
   category: 'Politics' | 'Economy' | 'Culture' | 'Sports' | 'Environment' | 'Health' | 'Technology' | 'Education' | 'Entertainment' | 'Travel';
   date: string;
   imageUrl: string;
+  subLocation?: string;
 }
 
 const NEWS_TEMPLATES: NewsItem[] = [
@@ -147,11 +148,14 @@ export default function App() {
   const [hoveredName, setHoveredName] = useState<string | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [coords, setCoords] = useState<{ lng: number; lat: number } | null>(null);
+  const [osmAddress, setOsmAddress] = useState<any>(null);
+  const [osmLoading, setOsmLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
+  const [selectedSubLocation, setSelectedSubLocation] = useState<string | null>(null);
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -348,18 +352,18 @@ export default function App() {
       filterExpression.push(false);
 
       if (mapInstance.getLayer(d.id)) {
-        mapInstance.setPaintProperty(d.id, 'fill-extrusion-color', paintProps['fill-extrusion-color']);
-        mapInstance.setPaintProperty(d.id, 'fill-extrusion-height', paintProps['fill-extrusion-height']);
+        mapInstance.setPaintProperty(d.id, 'fill-extrusion-color', paintProps['fill-extrusion-color'] as any);
+        mapInstance.setPaintProperty(d.id, 'fill-extrusion-height', paintProps['fill-extrusion-height'] as any);
         mapInstance.setPaintProperty(d.id, 'fill-extrusion-opacity', d.opacity);
-        mapInstance.setFilter(d.id, filterExpression);
+        mapInstance.setFilter(d.id, filterExpression as any);
         return;
       }
       mapInstance.addLayer({
         id: d.id,
         type: 'fill-extrusion',
         source: 'districts',
-        paint: paintProps,
-        filter: filterExpression
+        paint: paintProps as any,
+        filter: filterExpression as any
       });
     });
 
@@ -440,7 +444,8 @@ export default function App() {
               const shuffledTemplates = [...NEWS_TEMPLATES].sort(() => 0.5 - Math.random());
               const districtNews = shuffledTemplates.slice(0, newsCount).map(n => ({
                 ...n,
-                id: `${n.id}-${featureId}` // Make IDs unique per district
+                id: `${n.id}-${featureId}`, // Make IDs unique per district
+                subLocation: name // Initialize with cell name as the default sub-location
               }));
               
               // Store news in MOCK_NEWS by name for retrieval
@@ -534,9 +539,9 @@ export default function App() {
           if (features && features.length > 0) {
             isAnimatingRef.current = true;
             setIsAnimating(true);
+            setOsmLoading(true);
+
             const feature = features[0];
-            const props = feature.properties;
-            const name = props?.NAME_4 || props?.NAME_2 || props?.NAME_1 || 'Unknown';
             const clickCoords = e.lngLat;
             const featureId = feature.id ?? null;
 
@@ -563,6 +568,82 @@ export default function App() {
                 });
               }
             }, 300);
+
+            // Fetch OSM Reverse Geocoding in parallel
+            let osmName = '';
+            let osmAddr: any = null;
+            let subLocation = '';
+            try {
+              const osmRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${clickCoords.lat}&lon=${clickCoords.lng}&zoom=14`);
+              if (osmRes.ok) {
+                const data = await osmRes.json();
+                osmAddr = data;
+                const address = data.address || {};
+                subLocation = address.suburb || address.neighbourhood || address.village || address.quarter || address.town || address.hamlet || address.city_district || address.road || '';
+                const districtOrState = address.district || address.state_district || address.state || '';
+                osmName = subLocation && districtOrState ? `${subLocation}, ${districtOrState}` : (subLocation || districtOrState || data.display_name.split(',')[0] || 'Unknown Place');
+              }
+            } catch (err) {
+              console.error("OSM Click Reverse Geocode error", err);
+            }
+
+            if (!osmName) {
+              const props = feature.properties;
+              osmName = props?.NAME_4 || props?.NAME_2 || props?.NAME_1 || 'Unknown';
+            }
+
+            setOsmAddress(osmAddr);
+
+            // Find matching cell
+            let matchingCell = districtsDataRef.current?.features.find((f: any) => f.id === featureId);
+            if (!matchingCell && districtsDataRef.current) {
+              const pointPoint = turf.point([clickCoords.lng, clickCoords.lat]);
+              matchingCell = districtsDataRef.current.features.find((f: any) => {
+                try {
+                  return turf.booleanPointInPolygon(pointPoint, f);
+                } catch(err) {
+                  return false;
+                }
+              });
+            }
+
+            const cellName = matchingCell ? (matchingCell.properties?.NAME_4 || matchingCell.properties?.NAME_2 || matchingCell.properties?.NAME_1 || 'Unknown') : 'Unknown';
+            const subLocName = subLocation || osmName.split(',')[0] || 'Local Detail';
+
+            if (matchingCell && cellName !== 'Unknown') {
+              if (!MOCK_NEWS[cellName]) {
+                MOCK_NEWS[cellName] = [];
+              }
+
+              // Check if we already have news for this specific sub-location. If not, generate some
+              const alreadyHasSubLocNews = MOCK_NEWS[cellName].some(n => n.subLocation === subLocName);
+              if (!alreadyHasSubLocNews) {
+                const addCount = Math.floor(Math.random() * 3) + 1;
+                const shuffledTemplates = [...NEWS_TEMPLATES].sort(() => 0.5 - Math.random());
+                const subLocationNews = shuffledTemplates.slice(0, addCount).map((n, idx) => ({
+                  ...n,
+                  id: `osm-${subLocName.replace(/\s+/g, '-')}-${n.id}-${idx}-${Date.now()}`,
+                  title: `${n.title} in ${subLocName}`,
+                  summary: `${n.summary} Bringing localized reporting from the ${subLocName} area of ${cellName}.`,
+                  subLocation: subLocName,
+                  date: 'Just now'
+                }));
+                MOCK_NEWS[cellName] = [...subLocationNews, ...MOCK_NEWS[cellName]].slice(0, 15);
+              }
+
+              // Update matching grid cell heatmap color count based on the aggregated news list length
+              matchingCell.properties = {
+                ...matchingCell.properties,
+                newsCount: MOCK_NEWS[cellName].length
+              };
+
+              if (map.current) {
+                const src = map.current.getSource('districts') as maplibregl.GeoJSONSource;
+                if (src) {
+                  src.setData(districtsDataRef.current);
+                }
+              }
+            }
 
             // STEP 2: START LIFTING EARLY IN THE FLY
             setTimeout(() => {
@@ -602,7 +683,9 @@ export default function App() {
 
                 // STEP 4: OPEN UI (After animations complete)
                 setTimeout(() => {
-                  setSelectedDistrict(name);
+                  setSelectedDistrict(cellName !== 'Unknown' ? cellName : osmName);
+                  setSelectedSubLocation(subLocName);
+                  setOsmLoading(false);
                   setIsSettingsOpen(false);
                   setTimeout(() => {
                     isAnimatingRef.current = false;
@@ -639,6 +722,7 @@ export default function App() {
 
     // 1. Start UI exit
     setSelectedDistrict(null);
+    setSelectedSubLocation(null);
     setSearchQuery('');
     setGeocodedResults([]);
     
@@ -746,11 +830,12 @@ export default function App() {
     return [...local, ...external].slice(0, 5);
   }, [searchQuery, selectedDistrict, geocodedResults]);
 
-  const handleSuggestionClick = (suggestion: any) => {
+  const handleSuggestionClick = async (suggestion: any) => {
     if (!map.current || isAnimatingRef.current) return;
     
     isAnimatingRef.current = true;
     setIsAnimating(true);
+    setOsmLoading(true);
 
     let center: { lng: number; lat: number };
     let matchingFeature: any = null;
@@ -763,9 +848,13 @@ export default function App() {
       center = { lng: suggestion.lng, lat: suggestion.lat };
       if (districtsDataRef.current) {
         const point = turf.point([center.lng, center.lat]);
-        matchingFeature = districtsDataRef.current.features.find((f: any) => 
-          turf.booleanPointInPolygon(point, f)
-        );
+        matchingFeature = districtsDataRef.current.features.find((f: any) => {
+          try {
+            return turf.booleanPointInPolygon(point, f);
+          } catch(err) {
+            return false;
+          }
+        });
       }
     }
 
@@ -793,6 +882,68 @@ export default function App() {
         });
       }
     }, 300);
+
+    // Fetch OSM Reverse Geocoding in parallel
+    let osmName = '';
+    let osmAddr: any = null;
+    let subLocation = '';
+    try {
+      const osmRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${center.lat}&lon=${center.lng}&zoom=14`);
+      if (osmRes.ok) {
+        const data = await osmRes.json();
+        osmAddr = data;
+        const address = data.address || {};
+        subLocation = address.suburb || address.neighbourhood || address.village || address.quarter || address.town || address.hamlet || address.city_district || address.road || '';
+        const districtOrState = address.district || address.state_district || address.state || '';
+        osmName = subLocation && districtOrState ? `${subLocation}, ${districtOrState}` : (subLocation || districtOrState || data.display_name.split(',')[0] || 'Unknown Place');
+      }
+    } catch (err) {
+      console.error("OSM Suggestion Reverse Geocode error", err);
+    }
+
+    if (!osmName) {
+      osmName = suggestion.name || 'Unknown Place';
+    }
+
+    setOsmAddress(osmAddr);
+
+    const cellName = matchingFeature ? (matchingFeature.properties?.NAME_4 || matchingFeature.properties?.NAME_2 || matchingFeature.properties?.NAME_1 || 'Unknown') : 'Unknown';
+    const subLocName = subLocation || osmName.split(',')[0] || 'Local Detail';
+
+    if (matchingFeature && cellName !== 'Unknown') {
+      if (!MOCK_NEWS[cellName]) {
+        MOCK_NEWS[cellName] = [];
+      }
+
+      // Check if we already have news for this specific sub-location. If not, generate some
+      const alreadyHasSubLocNews = MOCK_NEWS[cellName].some(n => n.subLocation === subLocName);
+      if (!alreadyHasSubLocNews) {
+        const addCount = Math.floor(Math.random() * 3) + 1;
+        const shuffledTemplates = [...NEWS_TEMPLATES].sort(() => 0.5 - Math.random());
+        const subLocationNews = shuffledTemplates.slice(0, addCount).map((n, idx) => ({
+          ...n,
+          id: `osm-${subLocName.replace(/\s+/g, '-')}-${n.id}-${idx}-${Date.now()}`,
+          title: `${n.title} in ${subLocName}`,
+          summary: `${n.summary} Bringing localized reporting from the ${subLocName} area of ${cellName}.`,
+          subLocation: subLocName,
+          date: 'Just now'
+        }));
+        MOCK_NEWS[cellName] = [...subLocationNews, ...MOCK_NEWS[cellName]].slice(0, 15);
+      }
+
+      // Update matching grid cell heatmap color count based on the aggregated news list length
+      matchingFeature.properties = {
+        ...matchingFeature.properties,
+        newsCount: MOCK_NEWS[cellName].length
+      };
+
+      if (map.current) {
+        const src = map.current.getSource('districts') as maplibregl.GeoJSONSource;
+        if (src) {
+          src.setData(districtsDataRef.current);
+        }
+      }
+    }
 
     // STEP 3: Lift Cell
     setTimeout(() => {
@@ -832,10 +983,9 @@ export default function App() {
 
         // Step 4: Open UI
         setTimeout(() => {
-          if (matchingFeature) {
-            const name = matchingFeature.properties?.NAME_4 || matchingFeature.properties?.NAME_2 || matchingFeature.properties?.NAME_1 || 'Unknown';
-            setSelectedDistrict(name);
-          }
+          setSelectedDistrict(cellName !== 'Unknown' ? cellName : osmName);
+          setSelectedSubLocation(subLocName);
+          setOsmLoading(false);
           setIsSettingsOpen(false);
           setTimeout(() => {
             isAnimatingRef.current = false;
@@ -859,7 +1009,8 @@ export default function App() {
     if (searchQuery && selectedDistrict) {
       news = news.filter(n => 
         n.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        n.summary.toLowerCase().includes(searchQuery.toLowerCase())
+        n.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        n.subLocation?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     return news;
@@ -1159,9 +1310,16 @@ export default function App() {
 
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
                           <div className="space-y-2">
-                            <h1 className={`text-4xl md:text-5xl font-black tracking-tighter leading-none ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                              {selectedDistrict}
-                            </h1>
+                            <div className="flex flex-wrap items-center gap-3">
+                              <h1 className={`text-4xl md:text-5xl font-black tracking-tighter leading-none ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                {selectedDistrict}
+                              </h1>
+                              {selectedSubLocation && selectedSubLocation !== selectedDistrict && (
+                                <span className={`px-4 py-1.5 rounded-2xl font-mono text-xs font-black uppercase tracking-wider ${theme === 'dark' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                                  📍 {selectedSubLocation}
+                                </span>
+                              )}
+                            </div>
                             <div className={`flex items-center gap-2 text-[10px] font-black font-mono uppercase tracking-[0.2em] opacity-80 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                               <MapPin size={10} />
                               <div className="line-clamp-1">{famousInfo?.place} • {markerCoords?.lat}N, {markerCoords?.lng}E</div>
@@ -1173,6 +1331,38 @@ export default function App() {
                           </p>
                         </div>
                       </div>
+
+                      {osmLoading ? (
+                        <div className={`mb-8 p-6 rounded-[32px] border ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200/50'} flex gap-4 items-center shadow-sm animate-pulse`}>
+                          <div className="w-5 h-5 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin shrink-0" />
+                          <div className="space-y-1">
+                            <h4 className={`text-[10px] font-mono font-black uppercase tracking-[0.2em] opacity-40 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Street Finder / Querying OpenStreetMap...</h4>
+                            <p className={`text-xs font-semibold ${theme === 'dark' ? 'text-white/60' : 'text-gray-600'}`}>Locating points, neighborhoods, and nearby streets...</p>
+                          </div>
+                        </div>
+                      ) : (
+                        osmAddress && (
+                          <div className={`mb-8 p-6 rounded-[32px] border ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200/50'} flex flex-col md:flex-row gap-6 items-start md:items-center justify-between shadow-sm animate-fade-in`}>
+                            <div className="space-y-1">
+                              <h4 className={`text-xs font-black uppercase tracking-[0.2em] opacity-40 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Street Finder / OpenStreetMap</h4>
+                              <p className={`text-sm font-bold leading-relaxed ${theme === 'dark' ? 'text-white/90' : 'text-gray-800'}`}>{osmAddress.display_name}</p>
+                            </div>
+                            <div className="flex gap-2 flex-wrap shrink-0">
+                              {osmAddress.address?.postcode && (
+                                <div className={`px-3 py-1.5 rounded-xl font-mono text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'bg-white/10 text-white' : 'bg-gray-150 text-gray-700'}`}>
+                                  Postal: {osmAddress.address.postcode}
+                                </div>
+                              )}
+                              <div className={`px-3 py-1.5 rounded-xl font-mono text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'bg-white/10 text-white' : 'bg-gray-150 text-gray-700'}`}>
+                                Node: {osmAddress.osm_id}
+                              </div>
+                              <div className={`px-3 py-1.5 rounded-xl font-mono text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'bg-white/10 text-white/90' : 'bg-gray-150 text-gray-700'}`}>
+                                Type: {osmAddress.type || osmAddress.osm_type || 'point'}
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      )}
 
                       <div className="space-y-8 pb-20">
                        <div className="flex items-center justify-between">
@@ -1214,6 +1404,11 @@ export default function App() {
                                 >
                                   {news.category}
                                 </span>
+                                {news.subLocation && news.subLocation !== selectedDistrict && (
+                                  <span className={`px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider backdrop-blur-md rounded-full shadow-lg ${theme === 'dark' ? 'bg-white/10 text-emerald-400 border border-emerald-500/20' : 'bg-black/5 text-emerald-700 border border-emerald-500/10'}`}>
+                                    📍 {news.subLocation}
+                                  </span>
+                                )}
                                 <span className={`text-[10px] font-black opacity-30 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{news.date}</span>
                                </div>
                                <h2 
@@ -1277,6 +1472,8 @@ export default function App() {
           </div>
         </div>
       )}
+
+
 
       {error && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-red-950/20 backdrop-blur-md p-6">
